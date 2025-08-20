@@ -16,16 +16,17 @@ const HomePage: React.FC = () => {
   const [typeFilter, setTypeFilter] = useState("");
 
   
-  const { data, isLoading, isError } = useQuery<PaginatedPokemons>(
-    ["pokemons", page, limit, search, typeFilter],
-    () => getPokemons(page, limit, search, typeFilter),
-    { keepPreviousData: true }
-  );
+  const { data, isLoading, isError } = useQuery<PaginatedPokemons>({
+    queryKey: ["pokemons", page, limit, search, typeFilter],
+    queryFn: () => getPokemons(page, limit, search, typeFilter),
+    placeholderData: (previousData) => previousData
+  });
 
   
-  const deleteMutation = useMutation((id: number) => deletePokemon(id), {
+  const deleteMutation = useMutation({
+    mutationFn: (id: number) => deletePokemon(id),
     onSuccess: () => {
-      queryClient.invalidateQueries(["pokemons"]);
+      queryClient.invalidateQueries({ queryKey: ["pokemons"] });
     }
   });
 
