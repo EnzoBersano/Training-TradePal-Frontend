@@ -11,6 +11,7 @@
     "tailwind:init": "node_modules/.bin/tailwindcss init -p"
   },
   "dependencies": {
+    "@shadcn/ui": "^0.0.4",
     "@tanstack/react-query": "^5.85.5",
     "@tanstack/react-query-devtools": "^5.85.5",
     "react": "^19.1.1",
