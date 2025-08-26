@@ -27,7 +27,7 @@ const PokemonDetail: React.FC = () => {
   if (isError || !pokemon) {
     return (
         <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Pokémon not found</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Pokemon not found</h2>
           <button
               onClick={() => navigate('/')}
               className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
@@ -83,15 +83,12 @@ const PokemonDetail: React.FC = () => {
                   />
                 </div>
                 <div className="flex justify-center space-x-2 mb-4">
-                  {pokemon.type.map((type) => (
-                      <span
-                          key={type.id}
-                          className="px-4 py-2 rounded-full text-white font-medium capitalize"
-                          style={{ backgroundColor: getTypeColor(type.name) }}
-                      >
-                    {type.name}
+                  <span
+                      className="px-4 py-2 rounded-full text-white font-medium capitalize"
+                      style={{ backgroundColor: getTypeColor(pokemon.type) }}
+                  >
+                    {pokemon.type.toLowerCase()}
                   </span>
-                  ))}
                 </div>
               </div>
 
