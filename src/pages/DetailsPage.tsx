@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { getPokemon } from '../api/pokemon';
-import { getTypeColor } from '../utils/typeColors';
+import { getTypeColor } from '../utils/TypeColors.ts';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { Edit2, ArrowLeft } from 'lucide-react';
 
