@@ -1,7 +1,7 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
-import CreateEditPage from "./pages/CreateEditPage";
+import CreateEditPage from "./pages/CreateAndEditPage.tsx";
 import DetailsPage from "./pages/DetailsPage";
 
 const App: React.FC = () => {
