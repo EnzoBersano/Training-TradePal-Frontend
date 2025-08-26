@@ -1,68 +1,120 @@
-import React from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getPokemon, deletePokemon } from "../api/pokemon";
-import type { Pokemon } from "../types/pokemon";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import React from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { getPokemon } from '../api/pokemon';
+import { getTypeColor } from '../utils/typeColors';
+import LoadingSpinner from '../components/LoadingSpinner';
+import { Edit2, ArrowLeft } from 'lucide-react';
 
-const DetailsPage: React.FC = () => {
+const PokemonDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
 
-  // Fetch Pokémon data
-  const { data: pokemon, isLoading, isError } = useQuery<Pokemon>({
-    queryKey: ["pokemon", id],
-    queryFn: () => getPokemon(Number(id))
+  const { data: pokemon, isLoading, isError } = useQuery({
+    queryKey: ['pokemon', id],
+    queryFn: () => getPokemon(Number(id)),
+    enabled: !!id,
   });
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: () => deletePokemon(Number(id)),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["pokemons"] });
-      alert("Pokémon deleted!");
-      navigate("/");
-    },
-  });
+  if (isLoading) {
+    return (
+        <div className="flex justify-center items-center min-h-[400px]">
+          <LoadingSpinner size="lg" />
+        </div>
+    );
+  }
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError || !pokemon) return (
-    <div className="p-6 text-center">
-      <h1 className="text-2xl font-bold mb-4">Pokémon Not Found</h1>
-      <Button onClick={() => navigate("/")}>Back to List</Button>
-    </div>
-  );
+  if (isError || !pokemon) {
+    return (
+        <div className="text-center py-12">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Pokémon not found</h2>
+          <button
+              onClick={() => navigate('/')}
+              className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200"
+          >
+            Back to Home
+          </button>
+        </div>
+    );
+  }
+
 
   return (
-    <div className="max-w-md mx-auto p-6">
-      <Card className="shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl">{pokemon.name}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <img
-            src={pokemon.imageUrl}
-            alt={pokemon.name}
-            className="w-full h-64 object-cover rounded mb-4"
-          />
-          <p><strong>Type:</strong> {pokemon.type}</p>
-          <p><strong>Height:</strong> {pokemon.height} m</p>
-          <p><strong>Weight:</strong> {pokemon.weight} kg</p>
-          <div className="flex gap-2 mt-4">
-            <Button onClick={() => navigate(`/pokemon/edit/${pokemon.id}`)}>Edit</Button>
-            <Button variant="destructive" onClick={() => deleteMutation.mutate()}>
-              Delete
-            </Button>
-            <Button variant="secondary" onClick={() => navigate("/")}>
-              Back
-            </Button>
+      <div className="max-w-4xl mx-auto">
+        <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-gradient-to-br from-red-500 to-red-600 text-white p-6">
+            <div className="flex items-center justify-between mb-4">
+              <button
+                  onClick={() => navigate('/')}
+                  className="flex items-center space-x-2 text-white hover:text-red-200 transition-colors duration-200"
+              >
+                <ArrowLeft size={20} />
+                <span>Back to Pokédex</span>
+              </button>
+              <button
+                  onClick={() => navigate(`/pokemon/edit/${pokemon.id}`)}
+                  className="flex items-center space-x-2 bg-red-700 hover:bg-red-800 px-4 py-2 rounded-lg transition-colors duration-200"
+              >
+                <Edit2 size={18} />
+                <span>Edit</span>
+              </button>
+            </div>
+            <div className="text-center">
+              <h1 className="text-4xl font-bold capitalize mb-2">
+                {pokemon.name}
+              </h1>
+              <p className="text-red-200 text-lg">
+                #{pokemon.id.toString().padStart(3, '0')}
+              </p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
-    </div>
+
+          <div className="p-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+              <div className="text-center">
+                <div className="bg-gray-50 rounded-xl p-8 mb-6">
+                  <img
+                      src={pokemon.imageUrl || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemon.id}.png`}
+                      alt={pokemon.name}
+                      className="w-64 h-64 mx-auto object-contain"
+                      onError={(e) => {
+                        e.currentTarget.src = 'https://via.placeholder.com/256x256?text=Pokemon';
+                      }}
+                  />
+                </div>
+                <div className="flex justify-center space-x-2 mb-4">
+                  {pokemon.type.map((type) => (
+                      <span
+                          key={type.id}
+                          className="px-4 py-2 rounded-full text-white font-medium capitalize"
+                          style={{ backgroundColor: getTypeColor(type.name) }}
+                      >
+                    {type.name}
+                  </span>
+                  ))}
+                </div>
+              </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <h4 className="font-medium text-gray-700 mb-2">Physical Info</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span>Height:</span>
+                        <span className="font-medium">{pokemon.height / 10}m</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span>Weight:</span>
+                        <span className="font-medium">{pokemon.weight / 10}kg</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
   );
 };
 
-export default DetailsPage;
+export default PokemonDetail;
