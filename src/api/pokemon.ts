@@ -55,9 +55,3 @@ export const getPokemonsByAbility = async (ability: string): Promise<Pokemon[]> 
   const response = await api.get(`/abilities/pokemons?ability=${ability}`);
   return response.data;
 };
-
-export const getAbilities = async (name?: string): Promise<any[]> => {
-  const params = name ? `?name=${name}` : '';
-  const response = await api.get(`/abilities${params}`);
-  return response.data;
-};
